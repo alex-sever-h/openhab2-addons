@@ -7,6 +7,9 @@
  */
 package org.openhab.binding.homeautologic;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 
 /**
@@ -27,4 +30,5 @@ public class HomeAutoLogicBindingConstants {
     public final static String CHANNEL_TEMPERATURE = "temperature";
     public final static String CHANNEL_HUMIDITY = "humidity";
 
+    public final static Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections.singleton(THING_TYPE_SAMPLE);
 }
