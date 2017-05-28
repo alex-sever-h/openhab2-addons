@@ -34,6 +34,7 @@ public class HomeAutoLogicHandlerFactory extends BaseThingHandlerFactory {
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
         boolean value = SUPPORTED_THING_TYPES_UIDS.contains(thingTypeUID);
+        System.out.println(thingTypeUID + " " + value);
         return value;
     }
 
@@ -41,6 +42,8 @@ public class HomeAutoLogicHandlerFactory extends BaseThingHandlerFactory {
     protected ThingHandler createHandler(Thing thing) {
 
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
+
+        System.out.println("---->>>" + thingTypeUID);
 
         if (thingTypeUID.equals(THING_TYPE_SENSOR)) {
             return new HomeAutoLogicSensorHandler(thing);
