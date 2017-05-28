@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.smarthome.core.library.types.DecimalType;
+import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
@@ -32,14 +33,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
 /**
- * The {@link HomeAutoLogicHandler} is responsible for handling commands, which are
+ * The {@link HomeAutoLogicSensorHandler} is responsible for handling commands, which are
  * sent to one of the channels.
  *
  * @author Alexandru-Sever Horin - Initial contribution
  */
-public class HomeAutoLogicHandler extends BaseThingHandler {
+public class HomeAutoLogicSensorHandler extends BaseThingHandler {
 
-    private Logger logger = LoggerFactory.getLogger(HomeAutoLogicHandler.class);
+    private Logger logger = LoggerFactory.getLogger(HomeAutoLogicSensorHandler.class);
 
     private String ipAddress;
     private int port;
@@ -48,9 +49,11 @@ public class HomeAutoLogicHandler extends BaseThingHandler {
     float temperature = 0;
     int humidity = 0;
 
+    boolean onoff;
+
     ScheduledFuture<?> refreshJob;
 
-    public HomeAutoLogicHandler(Thing thing) {
+    public HomeAutoLogicSensorHandler(Thing thing) {
         super(thing);
     }
 
@@ -60,6 +63,16 @@ public class HomeAutoLogicHandler extends BaseThingHandler {
 
     private State getHumidity() {
         return new PercentType(humidity);
+    }
+
+    private State getOnOff() {
+        OnOffType on_off;
+        if (onoff) {
+            on_off = OnOffType.ON;
+        } else {
+            on_off = OnOffType.OFF;
+        }
+        return on_off;
     }
 
     @Override

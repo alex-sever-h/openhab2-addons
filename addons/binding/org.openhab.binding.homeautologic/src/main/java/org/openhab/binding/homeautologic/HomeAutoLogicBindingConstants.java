@@ -7,10 +7,11 @@
  */
 package org.openhab.binding.homeautologic;
 
-import java.util.Collections;
 import java.util.Set;
 
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * The {@link HomeAutoLogicBinding} class defines common constants, which are
@@ -23,12 +24,14 @@ public class HomeAutoLogicBindingConstants {
     public static final String BINDING_ID = "homeautologic";
 
     // List of all Thing Type UIDs
-    public final static ThingTypeUID THING_TYPE_SAMPLE = new ThingTypeUID(BINDING_ID, "sample");
+    public final static ThingTypeUID THING_TYPE_SWITCH = new ThingTypeUID(BINDING_ID, "switch");
+    public final static ThingTypeUID THING_TYPE_SENSOR = new ThingTypeUID(BINDING_ID, "sensor");
 
     // List of all Channel ids
-    public final static String CHANNEL_1 = "channel1";
+    public final static String CHANNEL_ONOFF = "onoff";
     public final static String CHANNEL_TEMPERATURE = "temperature";
     public final static String CHANNEL_HUMIDITY = "humidity";
 
-    public final static Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections.singleton(THING_TYPE_SAMPLE);
+    public final static Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_SWITCH,
+            THING_TYPE_SENSOR);
 }

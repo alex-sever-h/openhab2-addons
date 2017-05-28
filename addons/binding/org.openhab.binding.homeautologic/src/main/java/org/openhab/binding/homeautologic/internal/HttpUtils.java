@@ -82,6 +82,11 @@ public class HttpUtils {
         return IOUtils.toByteArray(connection.getInputStream());
     }
 
+    public static String getStringData(String urlString) throws Exception {
+        URL url = new URL(urlString);
+        URLConnection connection = url.openConnection();
+        return IOUtils.toString(connection.getInputStream());
+    }
     /**
      * Returns a byte array from a URL string
      *

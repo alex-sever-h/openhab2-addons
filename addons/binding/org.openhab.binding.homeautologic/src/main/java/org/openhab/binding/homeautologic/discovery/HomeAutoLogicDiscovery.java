@@ -18,8 +18,13 @@ import org.eclipse.smarthome.config.discovery.AbstractDiscoveryService;
 import org.eclipse.smarthome.config.discovery.DiscoveryResult;
 import org.eclipse.smarthome.config.discovery.DiscoveryResultBuilder;
 import org.eclipse.smarthome.core.thing.ThingUID;
+import org.openhab.binding.homeautologic.internal.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 /**
  *
@@ -59,13 +64,34 @@ public class HomeAutoLogicDiscovery extends AbstractDiscoveryService {
 
         InetAddress inet;
 
-        for (int i = 1; i < 5; i++) {
+        for (int i = 103; i < 110; i++) {
             try {
-                inet = InetAddress.getByAddress(new byte[] { 10, 10, 2, (byte) i });
+                inet = InetAddress.getByAddress(new byte[] { (byte) 192, (byte) 168, 0, (byte) i });
                 System.out.println("Sending Ping Request to " + inet);
                 System.out.println(inet.isReachable(1000) ? "Host is reachable" : "Host is NOT reachable");
                 if (inet.isReachable(1000)) {
-                    ThingUID uid = new ThingUID(THING_TYPE_SAMPLE, "t_h_".concat(Integer.toString(i)));
+                    String address = "http://" + inet.getHostAddress() + "/client?command=info";
+                    System.out.println(address);
+
+                    String data = HttpUtils.getStringData(address);
+
+                    JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+
+                    JsonObject jDevice = jsonObject.get("Device").getAsJsonObject();
+                    JsonElement jProduct = jDevice.get("product");
+
+                    String product = jProduct.getAsString();
+
+                    System.out.println(product); // John
+
+                    ThingUID uid = null;
+
+                    if (product.equals("Plug")) {
+                        uid = new ThingUID(THING_TYPE_SWITCH, "t_h_".concat(Integer.toString(i)));
+                    } else if (product.equals("Sensor")) {
+                        uid = new ThingUID(THING_TYPE_SENSOR, "pl_".concat(Integer.toString(i)));
+                    }
+
                     if (uid != null) {
                         Map<String, Object> properties = new HashMap<>(4);
                         properties.put("ip", inet.toString().substring(1));
