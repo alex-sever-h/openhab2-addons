@@ -9,8 +9,11 @@ package org.openhab.binding.homeautologic.internal;
 
 import static org.openhab.binding.homeautologic.HomeAutoLogicBindingConstants.*;
 
+import java.util.Collection;
 import java.util.Set;
 
+import org.eclipse.smarthome.core.items.Item;
+import org.eclipse.smarthome.core.items.ItemRegistry;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
@@ -27,6 +30,25 @@ import com.google.common.collect.ImmutableSet;
  * @author Alexandru-Sever Horin - Initial contribution
  */
 public class HomeAutoLogicHandlerFactory extends BaseThingHandlerFactory {
+
+    static int minWindowSize = 10;
+
+    static private ItemRegistry itemRegistry;
+
+    public void setItemRegistry(ItemRegistry itemRegistry_) {
+        itemRegistry = itemRegistry_;
+        Collection<Item> ci = itemRegistry.getAll();
+
+        System.out.println(ci);
+    }
+
+    public void unsetItemRegistry(ItemRegistry itemRegistry) {
+        itemRegistry = null;
+    }
+
+    static public ItemRegistry getItemRegistry() {
+        return itemRegistry;
+    }
 
     public final static Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_SWITCH,
             THING_TYPE_SENSOR);
@@ -46,9 +68,12 @@ public class HomeAutoLogicHandlerFactory extends BaseThingHandlerFactory {
         System.out.println("---->>>" + thingTypeUID);
 
         if (thingTypeUID.equals(THING_TYPE_SENSOR)) {
-            return new HomeAutoLogicSensorHandler(thing);
+            HomeAutoLogicSensorHandler sensorHandler = new HomeAutoLogicSensorHandler(thing);
+            return sensorHandler;
         } else if (thingTypeUID.equals(THING_TYPE_SWITCH)) {
-            return new HomeAutoLogicSwitchHandler(thing);
+            HomeAutoLogicSwitchHandler homeAutoLogicSwitchHandler = new HomeAutoLogicSwitchHandler(thing);
+            homeAutoLogicSwitchHandler.setItemRegistry(itemRegistry);
+            return homeAutoLogicSwitchHandler;
         }
 
         return null;

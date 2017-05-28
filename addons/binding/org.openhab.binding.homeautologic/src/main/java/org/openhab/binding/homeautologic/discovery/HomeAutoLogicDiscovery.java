@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.smarthome.config.discovery.AbstractDiscoveryService;
 import org.eclipse.smarthome.config.discovery.DiscoveryResult;
 import org.eclipse.smarthome.config.discovery.DiscoveryResultBuilder;
+import org.eclipse.smarthome.core.items.ItemRegistry;
 import org.eclipse.smarthome.core.thing.ThingUID;
 import org.openhab.binding.homeautologic.internal.HttpUtils;
 import org.slf4j.Logger;
@@ -53,6 +54,20 @@ public class HomeAutoLogicDiscovery extends AbstractDiscoveryService {
     @Override
     protected void startScan() {
         discoverHAL();
+    }
+
+    static private ItemRegistry itemRegistry;
+
+    public void setItemRegistry(ItemRegistry itemRegistry_) {
+        itemRegistry = itemRegistry_;
+    }
+
+    public void unsetItemRegistry(ItemRegistry itemRegistry) {
+        itemRegistry = null;
+    }
+
+    static public ItemRegistry getItemRegistry() {
+        return itemRegistry;
     }
 
     /**

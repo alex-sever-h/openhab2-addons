@@ -108,6 +108,7 @@ public class HomeAutoLogicSensorHandler extends BaseThingHandler {
                     // humidity = resp.getAsJsonObject().get("sensors").getAsJsonObject().get("humidity").getAsInt();
                     //
                     updateState(new ChannelUID(getThing().getUID(), CHANNEL_TEMPERATURE), getTemperature());
+
                     // updateState(new ChannelUID(getThing().getUID(), CHANNEL_HUMIDITY), getHumidity());
                 } catch (Exception e) {
                     logger.debug("Exception occurred during execution: {}", e.getMessage(), e);

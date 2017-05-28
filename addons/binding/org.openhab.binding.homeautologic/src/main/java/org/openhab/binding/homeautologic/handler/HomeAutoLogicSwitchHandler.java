@@ -10,10 +10,15 @@ package org.openhab.binding.homeautologic.handler;
 import static org.openhab.binding.homeautologic.HomeAutoLogicBindingConstants.CHANNEL_ONOFF;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.smarthome.core.items.Item;
+import org.eclipse.smarthome.core.items.ItemRegistry;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
@@ -48,6 +53,12 @@ public class HomeAutoLogicSwitchHandler extends BaseThingHandler {
     boolean onoff = true;
 
     ScheduledFuture<?> refreshJob;
+
+    static private ItemRegistry itemRegistry;
+
+    public void setItemRegistry(ItemRegistry itemRegistry_) {
+        itemRegistry = itemRegistry_;
+    }
 
     public HomeAutoLogicSwitchHandler(Thing thing) {
         super(thing);
@@ -99,6 +110,7 @@ public class HomeAutoLogicSwitchHandler extends BaseThingHandler {
             @Override
             public void run() {
                 try {
+                    boolean lonoff;
                     String jsonResponse = HttpUtils.getStringData(ipAddress, port);
                     logger.debug(jsonResponse);
 
@@ -115,10 +127,16 @@ public class HomeAutoLogicSwitchHandler extends BaseThingHandler {
                     int status = jProduct.getAsInt();
 
                     if (status != 0) {
-                        onoff = true;
+                        lonoff = true;
                     } else {
-                        onoff = false;
+                        lonoff = false;
                     }
+
+                    if (lonoff != onoff) {
+                        // TODO: Save sample
+                    }
+
+                    onoff = lonoff;
 
                     // JsonElement resp = new JsonParser().parse(jsonResponse);
                     // temperature = resp.getAsJsonObject().get("sensors").getAsJsonObject().get("temperature")
@@ -127,6 +145,38 @@ public class HomeAutoLogicSwitchHandler extends BaseThingHandler {
                     //
                     // updateState(new ChannelUID(getThing().getUID(), CHANNEL_TEMPERATURE), getTemperature());
                     updateState(new ChannelUID(getThing().getUID(), CHANNEL_ONOFF), getOnOff());
+
+                    Collection<Item> items = itemRegistry.getItems();
+
+                    StringBuffer sb = new StringBuffer();
+
+                    Iterator<Item> iterator = items.iterator();
+
+                    java.util.List<String> whitelist = new ArrayList<String>();
+
+                    whitelist.add("Temperature");
+                    whitelist.add("Switch");
+                    whitelist.add("Humidity");
+
+                    while (iterator.hasNext()) {
+
+                        Item item = iterator.next();
+
+                        String category = item.getCategory();
+
+                        if (whitelist.contains(category)) {
+                            String value = item.getState().toFullString();
+
+                            sb.append(value);
+
+                            if (iterator.hasNext()) {
+                                sb.append(",");
+                            }
+
+                        }
+                    }
+
+                    System.out.println("new value " + sb.toString());
                 } catch (Exception e) {
                     logger.debug("Exception occurred during execution: {}", e.getMessage(), e);
                     e.printStackTrace();

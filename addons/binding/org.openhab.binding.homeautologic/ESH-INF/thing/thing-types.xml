@@ -22,7 +22,7 @@
             <parameter name="refresh" type="integer" min="1">
                 <label>Refresh interval</label>
                 <description>Specifies the refresh interval in seconds.</description>
-                <default>6</default>
+                <default>2</default>
             </parameter>
         </config-description>
     </thing-type>
@@ -44,7 +44,7 @@
             <parameter name="refresh" type="integer" min="1">
                 <label>Refresh interval</label>
                 <description>Specifies the refresh interval in seconds.</description>
-                <default>6</default>
+                <default>2</default>
             </parameter>
         </config-description>
     </thing-type>
