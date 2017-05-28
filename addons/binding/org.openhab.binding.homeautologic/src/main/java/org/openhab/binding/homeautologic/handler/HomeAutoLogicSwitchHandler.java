@@ -41,7 +41,7 @@ public class HomeAutoLogicSwitchHandler extends BaseThingHandler {
     private int port;
     private BigDecimal refresh;
 
-    boolean onoff;
+    boolean onoff = true;
 
     ScheduledFuture<?> refreshJob;
 

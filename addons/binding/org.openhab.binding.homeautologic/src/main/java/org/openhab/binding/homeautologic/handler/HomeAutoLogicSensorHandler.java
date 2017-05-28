@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.smarthome.core.library.types.DecimalType;
-import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
@@ -30,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 /**
@@ -49,8 +49,6 @@ public class HomeAutoLogicSensorHandler extends BaseThingHandler {
     float temperature = 0;
     int humidity = 0;
 
-    boolean onoff;
-
     ScheduledFuture<?> refreshJob;
 
     public HomeAutoLogicSensorHandler(Thing thing) {
@@ -63,16 +61,6 @@ public class HomeAutoLogicSensorHandler extends BaseThingHandler {
 
     private State getHumidity() {
         return new PercentType(humidity);
-    }
-
-    private State getOnOff() {
-        OnOffType on_off;
-        if (onoff) {
-            on_off = OnOffType.ON;
-        } else {
-            on_off = OnOffType.OFF;
-        }
-        return on_off;
     }
 
     @Override
@@ -99,16 +87,28 @@ public class HomeAutoLogicSensorHandler extends BaseThingHandler {
             @Override
             public void run() {
                 try {
-                    String jsonResponse = HttpUtils.getStringData(ipAddress, port);
-                    logger.debug(jsonResponse);
+                    String address = "http://" + ipAddress + "/config?command=sensor";
+                    System.out.println(address);
 
-                    JsonElement resp = new JsonParser().parse(jsonResponse);
-                    temperature = resp.getAsJsonObject().get("sensors").getAsJsonObject().get("temperature")
-                            .getAsFloat();
-                    humidity = resp.getAsJsonObject().get("sensors").getAsJsonObject().get("humidity").getAsInt();
+                    String data = HttpUtils.getStringData(address);
 
+                    JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+
+                    JsonObject jDevice = jsonObject.get("response").getAsJsonObject();
+                    JsonElement jProduct = jDevice.get("temperature");
+
+                    float temp = jProduct.getAsInt();
+                    temperature = temp / 100.0f;
+                    // String jsonResponse = HttpUtils.getStringData(ipAddress, port);
+                    // logger.debug(jsonResponse);
+                    //
+                    // JsonElement resp = new JsonParser().parse(jsonResponse);
+                    // temperature = resp.getAsJsonObject().get("sensors").getAsJsonObject().get("temperature")
+                    // .getAsFloat();
+                    // humidity = resp.getAsJsonObject().get("sensors").getAsJsonObject().get("humidity").getAsInt();
+                    //
                     updateState(new ChannelUID(getThing().getUID(), CHANNEL_TEMPERATURE), getTemperature());
-                    updateState(new ChannelUID(getThing().getUID(), CHANNEL_HUMIDITY), getHumidity());
+                    // updateState(new ChannelUID(getThing().getUID(), CHANNEL_HUMIDITY), getHumidity());
                 } catch (Exception e) {
                     logger.debug("Exception occurred during execution: {}", e.getMessage(), e);
                     e.printStackTrace();
@@ -125,7 +125,7 @@ public class HomeAutoLogicSensorHandler extends BaseThingHandler {
 
         logger.debug("[alseh] My Home automation thingy");
 
-        this.port = 9090;
+        this.port = 80;
 
         HomeAutoLogicConfig config = getConfigAs(HomeAutoLogicConfig.class);
         this.ipAddress = config.ip;

@@ -34,7 +34,6 @@
 
         <channels>
             <channel id="onoff" typeId="onoff"/>
-
         </channels>
         
         <config-description>
@@ -50,12 +49,11 @@
         </config-description>
     </thing-type>
 
-    <!-- Sample Channel Type -->
-    <channel-type id="onoff">
-        <item-type>homeautologicItem</item-type>
-        <label>HomeAutoLogic Binding Channel</label>
-        <description>Sample channel for HomeAutoLogic Binding</description>
-        <category>Light</category>
+     <channel-type id="onoff">
+        <item-type>Switch</item-type>
+        <label>Switch</label>
+        <description>Turns the power on or off</description>
+        <category>Switch</category>
     </channel-type>
     
     
