@@ -27,6 +27,10 @@ import org.openhab.binding.homeautologic.internal.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 /**
  * The {@link HomeAutoLogicSwitchHandler} is responsible for handling commands, which are
  * sent to one of the channels.
@@ -67,6 +71,20 @@ public class HomeAutoLogicSwitchHandler extends BaseThingHandler {
         // "Could not control device at IP address x.x.x.x");
         switch (channelUID.getId()) {
             case CHANNEL_ONOFF:
+                String cmd = null;
+                if (command == OnOffType.ON) {
+                    cmd = "1";
+                } else {
+                    cmd = "0";
+                }
+                String address = "http://" + ipAddress + "/config?command=switch";
+                String postData = "{\"Response\":{\"status\":" + cmd + "}}";
+                try {
+                    HttpUtils.post(address, postData);
+                } catch (Exception e) {
+                    logger.debug("Exception occurred during execution: {}", e.getMessage(), e);
+                    e.printStackTrace();
+                }
                 updateState(channelUID, getOnOff());
                 break;
 
@@ -84,13 +102,31 @@ public class HomeAutoLogicSwitchHandler extends BaseThingHandler {
                     String jsonResponse = HttpUtils.getStringData(ipAddress, port);
                     logger.debug(jsonResponse);
 
+                    String address = "http://" + ipAddress + "/config?command=switch";
+                    System.out.println(address);
+
+                    String data = HttpUtils.getStringData(address);
+
+                    JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+
+                    JsonObject jDevice = jsonObject.get("response").getAsJsonObject();
+                    JsonElement jProduct = jDevice.get("status");
+
+                    int status = jProduct.getAsInt();
+
+                    if (status != 0) {
+                        onoff = true;
+                    } else {
+                        onoff = false;
+                    }
+
                     // JsonElement resp = new JsonParser().parse(jsonResponse);
                     // temperature = resp.getAsJsonObject().get("sensors").getAsJsonObject().get("temperature")
                     // .getAsFloat();
                     // humidity = resp.getAsJsonObject().get("sensors").getAsJsonObject().get("humidity").getAsInt();
                     //
                     // updateState(new ChannelUID(getThing().getUID(), CHANNEL_TEMPERATURE), getTemperature());
-                    // updateState(new ChannelUID(getThing().getUID(), CHANNEL_HUMIDITY), getHumidity());
+                    updateState(new ChannelUID(getThing().getUID(), CHANNEL_ONOFF), getOnOff());
                 } catch (Exception e) {
                     logger.debug("Exception occurred during execution: {}", e.getMessage(), e);
                     e.printStackTrace();
@@ -107,7 +143,7 @@ public class HomeAutoLogicSwitchHandler extends BaseThingHandler {
 
         logger.debug("[alseh] My Home automation thingy");
 
-        this.port = 9090;
+        this.port = 80;
 
         HomeAutoLogicConfig config = getConfigAs(HomeAutoLogicConfig.class);
         this.ipAddress = config.ip;
