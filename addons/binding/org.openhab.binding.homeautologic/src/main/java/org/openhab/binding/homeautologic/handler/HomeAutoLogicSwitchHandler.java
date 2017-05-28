@@ -27,6 +27,7 @@ import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.State;
+import org.no.rules.Predictor;
 import org.openhab.binding.homeautologic.config.HomeAutoLogicConfig;
 import org.openhab.binding.homeautologic.internal.HttpUtils;
 import org.slf4j.Logger;
@@ -52,6 +53,12 @@ public class HomeAutoLogicSwitchHandler extends BaseThingHandler {
 
     boolean onoff = true;
 
+    int windowSize = 5;
+    int windowIndex = 0;
+    String[] window = new String[windowSize];
+    Predictor predictor = new Predictor();
+
+    boolean predictorTrained = false;
     ScheduledFuture<?> refreshJob;
 
     static private ItemRegistry itemRegistry;
@@ -158,6 +165,12 @@ public class HomeAutoLogicSwitchHandler extends BaseThingHandler {
                     whitelist.add("Switch");
                     whitelist.add("Humidity");
 
+                    boolean first = true;
+
+                    int swIndex = -1;
+
+                    int counter = 0;
+
                     while (iterator.hasNext()) {
 
                         Item item = iterator.next();
@@ -165,14 +178,44 @@ public class HomeAutoLogicSwitchHandler extends BaseThingHandler {
                         String category = item.getCategory();
 
                         if (whitelist.contains(category)) {
+                            if (category.equals("Switch")) {
+                                swIndex = counter;
+                            }
+
                             String value = item.getState().toFullString();
 
-                            sb.append(value);
-
-                            if (iterator.hasNext()) {
+                            if (first) {
+                                first = false;
+                            } else {
                                 sb.append(",");
                             }
 
+                            sb.append(value);
+                            counter++;
+
+                        }
+                    }
+
+                    int lastIndex = windowIndex;
+
+                    if (counter == 3) {
+                        String newValue = sb.toString();
+
+                        window[windowIndex++] = newValue;
+                    }
+
+                    if (windowIndex >= windowSize) {
+                        windowIndex = 0;
+                        predictor.train(window, swIndex);
+                        predictorTrained = true;
+                    }
+
+                    if (predictorTrained) {
+                        double[] prediction = predictor.predict(window[lastIndex], swIndex);
+
+                        System.out.println("Prediction for last value: ");
+                        for (int i = 0; i < prediction.length; i++) {
+                            System.out.println("value " + i + " prediction: " + prediction[i]);
                         }
                     }
 
