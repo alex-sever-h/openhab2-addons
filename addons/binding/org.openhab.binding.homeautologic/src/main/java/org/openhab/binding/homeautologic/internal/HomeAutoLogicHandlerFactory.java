@@ -16,6 +16,7 @@ import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.openhab.binding.homeautologic.handler.HomeAutoLogicSensorHandler;
+import org.openhab.binding.homeautologic.handler.HomeAutoLogicSwitchHandler;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -32,7 +33,8 @@ public class HomeAutoLogicHandlerFactory extends BaseThingHandlerFactory {
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
-        return SUPPORTED_THING_TYPES_UIDS.contains(thingTypeUID);
+        boolean value = SUPPORTED_THING_TYPES_UIDS.contains(thingTypeUID);
+        return value;
     }
 
     @Override
@@ -43,7 +45,7 @@ public class HomeAutoLogicHandlerFactory extends BaseThingHandlerFactory {
         if (thingTypeUID.equals(THING_TYPE_SENSOR)) {
             return new HomeAutoLogicSensorHandler(thing);
         } else if (thingTypeUID.equals(THING_TYPE_SWITCH)) {
-            return new HomeAutoLogicSensorHandler(thing);
+            return new HomeAutoLogicSwitchHandler(thing);
         }
 
         return null;

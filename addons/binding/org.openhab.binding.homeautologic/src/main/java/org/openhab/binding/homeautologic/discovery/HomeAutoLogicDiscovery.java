@@ -96,7 +96,7 @@ public class HomeAutoLogicDiscovery extends AbstractDiscoveryService {
                         Map<String, Object> properties = new HashMap<>(4);
                         properties.put("ip", inet.toString().substring(1));
                         DiscoveryResult result = DiscoveryResultBuilder.create(uid).withProperties(properties)
-                                .withLabel("t+h discovered").build();
+                                .withLabel(product + " discovered").build();
                         thingDiscovered(result);
                     }
                 }
