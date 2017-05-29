@@ -79,7 +79,7 @@ public class HomeAutoLogicDiscovery extends AbstractDiscoveryService {
 
         InetAddress inet;
 
-        for (int i = 103; i < 110; i++) {
+        for (int i = 100; i < 110; i++) {
             try {
                 inet = InetAddress.getByAddress(new byte[] { (byte) 192, (byte) 168, 0, (byte) i });
                 System.out.println("Sending Ping Request to " + inet);
