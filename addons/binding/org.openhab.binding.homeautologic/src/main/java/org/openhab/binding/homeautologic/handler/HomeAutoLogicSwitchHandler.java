@@ -61,6 +61,8 @@ public class HomeAutoLogicSwitchHandler extends BaseThingHandler {
     boolean predictorTrained = false;
     ScheduledFuture<?> refreshJob;
 
+    ScheduledFuture<?> trainJob;
+
     static private ItemRegistry itemRegistry;
 
     public void setItemRegistry(ItemRegistry itemRegistry_) {
@@ -111,6 +113,8 @@ public class HomeAutoLogicSwitchHandler extends BaseThingHandler {
                 break;
         }
     }
+
+    int swIndex = -1;
 
     private void startAutomaticRefresh() {
         Runnable runnable = new Runnable() {
@@ -167,8 +171,6 @@ public class HomeAutoLogicSwitchHandler extends BaseThingHandler {
 
                     boolean first = true;
 
-                    int swIndex = -1;
-
                     int counter = 0;
 
                     while (iterator.hasNext()) {
@@ -203,11 +205,15 @@ public class HomeAutoLogicSwitchHandler extends BaseThingHandler {
 
                         window[windowIndex++] = newValue;
                     }
-
                     if (windowIndex >= windowSize) {
                         windowIndex = 0;
-                        predictor.train(window, swIndex);
-                        predictorTrained = true;
+
+                        try {
+                            predictor.train(window, swIndex);
+                            predictorTrained = true;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     if (predictorTrained) {
@@ -228,6 +234,25 @@ public class HomeAutoLogicSwitchHandler extends BaseThingHandler {
         };
 
         refreshJob = scheduler.scheduleAtFixedRate(runnable, 0, refresh.intValue(), TimeUnit.SECONDS);
+    }
+
+    private void startPeriodicTrain() {
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    // Thread.sleep(25000);
+                    predictor.train(window, swIndex);
+                    predictorTrained = true;
+
+                } catch (Exception e) {
+                    logger.debug("Exception occurred during execution: {}", e.getMessage(), e);
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        // trainJob = scheduler.scheduleAtFixedRate(runnable, 0, 60, TimeUnit.SECONDS);
     }
 
     @Override

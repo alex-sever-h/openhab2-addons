@@ -33,7 +33,7 @@ import com.google.gson.JsonParser;
 public class HttpUtils {
     private static Logger logger = LoggerFactory.getLogger(HttpUtils.class);
 
-    private static int TIMEOUT = 5000;
+    private static int TIMEOUT = 10000;
     private static HttpClient client = new HttpClient();
     /**
      * JSON request to get the CLI port from a Squeeze Server
