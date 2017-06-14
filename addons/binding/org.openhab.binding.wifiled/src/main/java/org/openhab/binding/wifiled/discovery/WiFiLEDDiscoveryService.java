@@ -103,7 +103,6 @@ public class WiFiLEDDiscoveryService extends AbstractDiscoveryService {
                 logger.debug("Adding a new WiFi LED with IP '{}' and MAC '{}' to inbox", ip, mac);
                 Map<String, Object> properties = new HashMap<>();
                 properties.put("ip", ip);
-                properties.put("protocol", AbstractWiFiLEDDriver.Protocol.LD382A);
                 ThingUID uid = new ThingUID(THING_TYPE_WIFILED, mac);
 
                 DiscoveryResult result = DiscoveryResultBuilder.create(uid)
