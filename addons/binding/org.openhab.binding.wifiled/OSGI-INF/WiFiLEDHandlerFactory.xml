@@ -9,12 +9,13 @@
     http://www.eclipse.org/legal/epl-v10.html
 
 -->
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.openhab.binding.wifiled.internal.WiFiLEDHandlerFactory">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" 
+   name="org.openhab.binding.wifiled.internal.WiFiLEDHandlerFactory">
 
-   <scr:implementation class="org.openhab.binding.wifiled.internal.WiFiLEDHandlerFactory"/>
+   <implementation class="org.openhab.binding.wifiled.internal.WiFiLEDHandlerFactory"/>
 
-   <scr:service>
+   <service>
       <provide interface="org.eclipse.smarthome.core.thing.binding.ThingHandlerFactory"/>
-   </scr:service>
+   </service>
 
 </scr:component>
